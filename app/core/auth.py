@@ -7,7 +7,7 @@ from sqlalchemy.orm.session import Session
 
 from app.core.config import settings
 from app.core.security import verify_password
-from app.models.user import User
+from app.models.user import UserModel
 
 JWTPayloadMapping = MutableMapping[
     str, Union[datetime, bool, str, List[str], List[int]]
@@ -21,8 +21,8 @@ def authenticate(
     email: str,
     password: str,
     db: Session,
-) -> Optional[User]:
-    user = db.query(User).filter(User.email == email).first()
+) -> Optional[UserModel]:
+    user = db.query(UserModel).filter(UserModel.email == email).first()
     if not user:
         return None
     if not verify_password(password, user.hashed_password):

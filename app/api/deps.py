@@ -10,7 +10,7 @@ from app.clients.reddit import RedditClient
 from app.core.auth import oauth2_scheme
 from app.core.config import settings
 from app.db.session import SessionLocal
-from app.models.user import User
+from app.models.user import UserModel
 
 
 class TokenData(BaseModel):
@@ -32,7 +32,7 @@ def get_reddit_client() -> RedditClient:
 
 async def get_current_user(
     db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
-) -> User:
+) -> UserModel:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -52,15 +52,15 @@ async def get_current_user(
     except JWTError:
         raise credentials_exception
 
-    user = db.query(User).filter(User.id == token_data.username).first()
+    user = db.query(UserModel).filter(UserModel.id == token_data.username).first()
     if user is None:
         raise credentials_exception
     return user
 
 
 def get_current_active_superuser(
-    current_user: User = Depends(get_current_user),
-) -> User:
+    current_user: UserModel = Depends(get_current_user),
+) -> UserModel:
     if not crud.user.is_superuser(current_user):
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"

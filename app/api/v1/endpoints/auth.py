@@ -7,7 +7,7 @@ from sqlalchemy.orm.session import Session
 from app import crud, schemas
 from app.api import deps
 from app.core.auth import authenticate, create_access_token
-from app.models.user import User
+from app.models.user import UserModel
 
 router = APIRouter()
 
@@ -31,7 +31,7 @@ def login(
 
 
 @router.get("/me", response_model=schemas.User)
-def read_users_me(current_user: User = Depends(deps.get_current_user)):
+def read_users_me(current_user: UserModel = Depends(deps.get_current_user)):
     """
     Fetch the current logged in user.
     """
@@ -50,7 +50,7 @@ def create_user_signup(
     Create new user without the need to be logged in.
     """
 
-    user = db.query(User).filter(User.email == user_in.email).first()
+    user = db.query(UserModel).filter(UserModel.email == user_in.email).first()
     if user:
         raise HTTPException(
             status_code=400,

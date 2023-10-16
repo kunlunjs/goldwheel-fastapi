@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app import crud
 from app.api import deps
 from app.clients.reddit import RedditClient
-from app.models.user import User
+from app.models.user import UserModel
 from app.schemas.recipe import (
     Recipe,
     RecipeCreate,
@@ -61,7 +61,7 @@ def create_recipe(
     *,
     recipe_in: RecipeCreate,
     db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_user),
+    current_user: UserModel = Depends(deps.get_current_user),
 ) -> dict:
     """
     Create a new recipe in the database.
@@ -119,7 +119,7 @@ async def get_reddit_top_async(subreddit: str) -> list:
 
 @router.get("/ideas/async")
 async def fetch_ideas_async(
-    user: User = Depends(deps.get_current_active_superuser),
+    user: UserModel = Depends(deps.get_current_active_superuser),
 ) -> dict:
     results = await asyncio.gather(
         *[get_reddit_top_async(subreddit=subreddit) for subreddit in RECIPE_SUBREDDITS]
